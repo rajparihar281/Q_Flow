@@ -9,7 +9,8 @@ import 'package:q_flow/data/repositories/patient_repository.dart';
 import 'package:q_flow/presentation/home/home_screen.dart';
 
 class OtpScreen extends StatefulWidget {
-  const OtpScreen({super.key});
+  final String abhaId;
+  const OtpScreen({super.key, required this.abhaId});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -52,7 +53,7 @@ class _OtpScreenState extends State<OtpScreen>
   Future<void> _verify() async {
     final otp = _otpCtrls.map((c) => c.text).join();
     setState(() => _verifying = true);
-    await _repo.verifyOtp('PMJAY-MH-2024-887654', otp);
+    await _repo.verifyOtp(widget.abhaId, otp);
     if (!mounted) return;
     setState(() {
       _verifying = false;
@@ -69,8 +70,12 @@ class _OtpScreenState extends State<OtpScreen>
   @override
   void dispose() {
     _checkCtrl.dispose();
-    for (final c in _otpCtrls) c.dispose();
-    for (final f in _focusNodes) f.dispose();
+    for (final c in _otpCtrls) {
+      c.dispose();
+    }
+    for (final f in _focusNodes) {
+      f.dispose();
+    }
     super.dispose();
   }
 
@@ -92,12 +97,19 @@ class _OtpScreenState extends State<OtpScreen>
                 const SizedBox(height: AppSpacing.sm),
                 const Text(
                   'OTP Verification',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'OTP sent to registered mobile number',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 13,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 if (_success)
@@ -169,7 +181,9 @@ class _OtpScreenState extends State<OtpScreen>
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
+                        disabledBackgroundColor: AppColors.primary.withOpacity(
+                          0.5,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -197,7 +211,10 @@ class _OtpScreenState extends State<OtpScreen>
                 Text(
                   AppStrings.consentNotice,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 10),
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 10,
+                  ),
                 ),
               ],
             ),

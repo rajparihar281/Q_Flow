@@ -6,7 +6,7 @@ class HospitalModel {
   final String specialities;
   final String address;
   final String phone;
-  final List<DoctorModel> doctors;
+  final List<HospitalDoctorModel> doctors;
 
   const HospitalModel({
     required this.id,
@@ -20,7 +20,7 @@ class HospitalModel {
   });
 }
 
-class DoctorModel {
+class HospitalDoctorModel {
   final String id;
   final String name;
   final String specialization;
@@ -30,7 +30,7 @@ class DoctorModel {
   final String availability;
   final String hospitalId;
 
-  const DoctorModel({
+  const HospitalDoctorModel({
     required this.id,
     required this.name,
     required this.specialization,

@@ -158,9 +158,7 @@ class _HospitalDetailScreenState extends State<HospitalDetailScreen>
       decoration: BoxDecoration(
         color: AppColors.cardBg.withOpacity(0.5),
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(
-          color: AppColors.primary.withOpacity(0.3),
-        ),
+        border: Border.all(color: AppColors.primary.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,7 +208,7 @@ class _HospitalDetailScreenState extends State<HospitalDetailScreen>
 }
 
 class _DoctorCard extends StatelessWidget {
-  final DoctorModel doctor;
+  final HospitalDoctorModel doctor;
   final VoidCallback onBook;
 
   const _DoctorCard({required this.doctor, required this.onBook});
@@ -223,9 +221,7 @@ class _DoctorCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(
-          color: AppColors.primary.withOpacity(0.3),
-        ),
+        border: Border.all(color: AppColors.primary.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,7 +264,11 @@ class _DoctorCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           Row(
             children: [
-              Icon(Icons.work_outline, size: 14, color: AppColors.textSecondary),
+              Icon(
+                Icons.work_outline,
+                size: 14,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: 4),
               Text(
                 doctor.experience,
@@ -277,7 +277,11 @@ class _DoctorCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
-              const Icon(Icons.star_rounded, size: 14, color: AppColors.warning),
+              const Icon(
+                Icons.star_rounded,
+                size: 14,
+                color: AppColors.warning,
+              ),
               const SizedBox(width: 4),
               Text(
                 doctor.rating.toString(),

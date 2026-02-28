@@ -4,6 +4,7 @@ class AppColors {
   AppColors._();
 
   static const primary = Color(0xFF06b6d4);
+  static const neon = Color(0xFF00d9ff);
   static const secondary = Color(0xFF10b981);
   static const accent = Color(0xFF8b5cf6);
   static const danger = Color(0xFFef4444);
@@ -14,7 +15,13 @@ class AppColors {
   static const textSecondary = Color(0xFFa0aec0);
   static const textHint = Color(0xFF718096);
   static const divider = Color(0xFF2d3748);
-  static const inputFill = Color(0xFF1a2332);
+  static const inputFill = Color(0x331e3a8a); // Glass input fill
+
+  // Transparency Layers
+  static final glassEffect = cardBg.withOpacity(0.1);
+  static final borderGlow = neon.withOpacity(0.3);
+  static final shadowGlow = neon.withOpacity(0.6);
+  static final hoverState = primary.withOpacity(0.2);
 
   static const gradientStart = Color(0xFF0a0e27);
   static const gradientEnd = Color(0xFF1e3a8a);
@@ -119,20 +126,20 @@ class AppTheme {
       fillColor: AppColors.inputFill,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.primary.withOpacity(0.3)),
+        borderSide: BorderSide(color: AppColors.borderGlow),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.primary.withOpacity(0.3)),
+        borderSide: BorderSide(color: AppColors.primary.withOpacity(0.2)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        borderSide: const BorderSide(color: AppColors.neon, width: 1.5),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     ),
     cardTheme: CardThemeData(
-      color: AppColors.cardBg,
+      color: Colors.transparent, // Let Container handle glassmorphism
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     ),

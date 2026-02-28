@@ -137,8 +137,8 @@ class _UpcomingAppointmentsScreenState
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Failed to reschedule appointment'),
-          backgroundColor: AppColors.danger,
+          content: Text('Rescheduling not yet supported — coming soon'),
+          backgroundColor: AppColors.warning,
         ),
       );
     }
@@ -268,9 +268,12 @@ class _AppointmentCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(apt.doctorName, style: AppTextStyles.headlineSmall),
                     Text(
-                      apt.specialization,
+                      apt.doctorName ?? 'Doctor',
+                      style: AppTextStyles.headlineSmall,
+                    ),
+                    Text(
+                      apt.specialization ?? '',
                       style: AppTextStyles.caption.copyWith(
                         color: AppColors.primary,
                       ),
@@ -317,7 +320,7 @@ class _AppointmentCard extends StatelessWidget {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        apt.hospitalName,
+                        apt.hospitalName ?? '',
                         style: AppTextStyles.bodyMedium,
                       ),
                     ),

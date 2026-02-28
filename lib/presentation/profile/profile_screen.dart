@@ -23,12 +23,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _load() async {
-    final patient = await PatientRepository().getPatientProfile();
-    if (!mounted) return;
-    setState(() {
-      _patient = patient;
-      _loading = false;
-    });
+    try {
+      final patient = await PatientRepository().getPatientProfile();
+      if (!mounted) return;
+      setState(() {
+        _patient = patient;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   @override
@@ -173,8 +180,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: AppTextStyles.bodyMedium,
             )
           else
-            ...patient.medicalAlerts.map(
-              (alert) => Padding(
+            ...patient.alertTypes.map(
+              (alertType) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
                 child: Row(
                   children: [
@@ -185,7 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     Text(
-                      alert,
+                      alertType,
                       style: const TextStyle(
                         color: AppColors.danger,
                         fontWeight: FontWeight.w500,

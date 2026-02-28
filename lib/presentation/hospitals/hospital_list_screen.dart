@@ -7,6 +7,7 @@ import 'package:q_flow/core/widgets/state_widgets.dart';
 import 'package:q_flow/data/models/hospital_model.dart';
 import 'package:q_flow/data/repositories/hospital_repository.dart';
 import 'package:q_flow/presentation/hospitals/hospital_detail_screen.dart';
+import 'package:q_flow/core/widgets/app_card.dart';
 
 class HospitalListScreen extends StatefulWidget {
   const HospitalListScreen({super.key});
@@ -159,79 +160,74 @@ class _HospitalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.cardBg,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(
-          color: AppColors.primary.withOpacity(0.3),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(
-                color: AppColors.primary.withOpacity(0.5),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: AppCard(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        borderRadius: AppRadius.xl,
+        borderGlow: false,
+        child: Row(
+          children: [
+            Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                border: Border.all(color: AppColors.primary.withOpacity(0.5)),
+              ),
+              child: const Icon(
+                Icons.local_hospital_rounded,
+                color: AppColors.primary,
+                size: 28,
               ),
             ),
-            child: const Icon(
-              Icons.local_hospital_rounded,
-              color: AppColors.primary,
-              size: 28,
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm + 4),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(hospital.name, style: AppTextStyles.headlineSmall),
-                const SizedBox(height: 3),
-                Text(
-                  hospital.specialities,
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.primary,
+            const SizedBox(width: AppSpacing.sm + 4),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(hospital.name, style: AppTextStyles.headlineSmall),
+                  const SizedBox(height: 3),
+                  Text(
+                    hospital.specialities,
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.primary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.location_on_outlined,
-                      size: 13,
-                      color: AppColors.textSecondary,
-                    ),
-                    const SizedBox(width: 2),
-                    Text(hospital.distance, style: AppTextStyles.bodySmall),
-                    const SizedBox(width: AppSpacing.sm),
-                    const Icon(
-                      Icons.star_rounded,
-                      size: 13,
-                      color: AppColors.warning,
-                    ),
-                    const SizedBox(width: 2),
-                    Text(
-                      hospital.rating.toString(),
-                      style: AppTextStyles.bodySmall,
-                    ),
-                  ],
-                ),
-              ],
+                  const SizedBox(height: AppSpacing.xs),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 13,
+                        color: AppColors.textSecondary,
+                      ),
+                      const SizedBox(width: 2),
+                      Text(hospital.distance, style: AppTextStyles.bodySmall),
+                      const SizedBox(width: AppSpacing.sm),
+                      const Icon(
+                        Icons.star_rounded,
+                        size: 13,
+                        color: AppColors.warning,
+                      ),
+                      const SizedBox(width: 2),
+                      Text(
+                        hospital.rating.toString(),
+                        style: AppTextStyles.bodySmall,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          const Icon(
-            Icons.chevron_right_rounded,
-            color: AppColors.primary,
-            size: 26,
-          ),
-        ],
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.primary,
+              size: 26,
+            ),
+          ],
+        ),
       ),
     );
   }

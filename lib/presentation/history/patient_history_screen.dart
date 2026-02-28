@@ -154,12 +154,15 @@ class _AppointmentCard extends StatelessWidget {
   const _AppointmentCard({required this.appointment});
 
   Color get _statusColor {
-    switch (appointment.status) {
-      case AppointmentStatus.completed:
+    switch (appointment.status.toLowerCase()) {
+      case 'completed':
         return AppColors.secondary;
-      case AppointmentStatus.cancelled:
+      case 'cancelled':
         return AppColors.danger;
-      case AppointmentStatus.upcoming:
+      case 'scheduled':
+      case 'confirmed':
+        return AppColors.primary;
+      default:
         return AppColors.primary;
     }
   }
@@ -187,7 +190,10 @@ class _AppointmentCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(apt.doctorName, style: AppTextStyles.headlineSmall),
+                child: Text(
+                  apt.doctorName ?? 'Doctor',
+                  style: AppTextStyles.headlineSmall,
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -199,7 +205,7 @@ class _AppointmentCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppRadius.full),
                 ),
                 child: Text(
-                  apt.status.label,
+                  apt.label,
                   style: TextStyle(
                     color: _statusColor,
                     fontSize: 11,
@@ -211,10 +217,10 @@ class _AppointmentCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            apt.specialization,
+            apt.specialization ?? '',
             style: AppTextStyles.caption.copyWith(color: AppColors.primary),
           ),
-          Text(apt.hospitalName, style: AppTextStyles.bodySmall),
+          Text(apt.hospitalName ?? '', style: AppTextStyles.bodySmall),
           const Divider(height: 16),
           Row(
             children: [
@@ -262,24 +268,17 @@ class _AppointmentCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Booking ID: ${apt.bookingId}',
+                'ID: ${apt.id.length > 8 ? apt.id.substring(0, 8) : apt.id}',
                 style: AppTextStyles.bodySmall,
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                decoration: BoxDecoration(
-                  color: AppUtils.severityColor(apt.severity).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(AppRadius.full),
-                ),
-                child: Text(
-                  apt.severity,
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: AppUtils.severityColor(apt.severity),
+              if (apt.estimatedWaitMinutes > 0)
+                Text(
+                  '~${apt.estimatedWaitMinutes} min wait',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
             ],
           ),
         ],

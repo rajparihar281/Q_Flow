@@ -130,14 +130,14 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen>
           _row(
             Icons.person_outline_rounded,
             'Doctor',
-            apt.doctorName,
+            apt.doctorName ?? '',
             AppColors.secondary,
           ),
           const Divider(height: 20),
           _row(
             Icons.local_hospital_outlined,
             'Hospital',
-            apt.hospitalName,
+            apt.hospitalName ?? '',
             AppColors.primary,
           ),
           const Divider(height: 20),

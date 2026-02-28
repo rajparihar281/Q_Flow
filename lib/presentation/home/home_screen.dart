@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:q_flow/core/constants/app_constants.dart';
 import 'package:q_flow/core/utils/app_utils.dart';
 import 'package:q_flow/core/widgets/gradient_scaffold.dart';
+import 'package:q_flow/core/widgets/app_card.dart';
 import 'package:q_flow/core/widgets/state_widgets.dart';
 import 'package:q_flow/data/models/patient_model.dart';
 import 'package:q_flow/data/models/appointment_model.dart';
@@ -25,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   PatientModel? _patient;
   List<AppointmentModel>? _upcomingAppointments;
   bool _loading = true;
+  String? _error;
 
   @override
   void initState() {
@@ -33,14 +35,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadData() async {
-    final patient = await PatientRepository().getPatientProfile();
-    final appointments = await AppointmentRepository().getUpcomingAppointments();
-    if (!mounted) return;
-    setState(() {
-      _patient = patient;
-      _upcomingAppointments = appointments;
-      _loading = false;
-    });
+    try {
+      final patient = await PatientRepository().getPatientProfile();
+      final appointments = await AppointmentRepository()
+          .getUpcomingAppointments();
+      if (!mounted) return;
+      setState(() {
+        _patient = patient;
+        _upcomingAppointments = appointments;
+        _loading = false;
+        _error = null;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = e.toString();
+      });
+    }
   }
 
   @override
@@ -48,6 +60,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return GradientScaffold(
       child: _loading
           ? const LoadingWidget(message: 'Loading...')
+          : _error != null
+          ? ErrorStateWidget(
+              message: 'Failed to load data: $_error',
+              onRetry: _loadData,
+            )
           : SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,77 +84,69 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHeader() {
-    return Container(
-      margin: const EdgeInsets.all(AppSpacing.md),
+    return Padding(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: Colors.white.withOpacity(0.3)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-            ),
-            child: Center(
-              child: Text(
-                _patient?.initials ?? 'RK',
-                style: const TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
+      child: GlassCard(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        borderRadius: AppRadius.xl,
+        child: Row(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.9),
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+              ),
+              child: Center(
+                child: Text(
+                  _patient?.initials ?? 'RK',
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Welcome back,',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 13,
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Welcome back,',
+                    style: TextStyle(color: Colors.white70, fontSize: 13),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  _patient?.fullName ?? 'Loading...',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(height: 2),
+                  Text(
+                    _patient?.fullName ?? 'Loading...',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'ABHA ID: ${_patient?.abhaId ?? ''}',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 11,
+                  const SizedBox(height: 2),
+                  Text(
+                    'ABHA ID: ${_patient?.abhaId ?? ''}',
+                    style: const TextStyle(color: Colors.white70, fontSize: 11),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          IconButton(
-            onPressed: () {
-              Navigator.push(context, slideRoute(const ProfileScreen()));
-            },
-            icon: const Icon(
-              Icons.person_rounded,
-              color: Colors.white,
-              size: 28,
+            IconButton(
+              onPressed: () {
+                Navigator.push(context, slideRoute(const ProfileScreen()));
+              },
+              icon: const Icon(
+                Icons.person_rounded,
+                color: Colors.white,
+                size: 28,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -216,10 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
               colors: [Color(0xFF0D7CBA), Color(0xFF12B886)],
             ),
             onTap: () {
-              Navigator.push(
-                context,
-                slideRoute(const HospitalListScreen()),
-              );
+              Navigator.push(context, slideRoute(const HospitalListScreen()));
             },
           ),
         ],
@@ -228,90 +234,85 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildUpcomingAppointments() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.cardBg.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(
-          color: AppColors.primary.withOpacity(0.3),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Upcoming Appointments',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              if (_upcomingAppointments != null &&
-                  _upcomingAppointments!.isNotEmpty)
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      slideRoute(const UpcomingAppointmentsScreen()),
-                    );
-                  },
-                  child: Text(
-                    'View All',
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      child: GlassCard(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        borderRadius: AppRadius.xl,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Upcoming Appointments',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          if (_upcomingAppointments == null || _upcomingAppointments!.isEmpty)
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: const Center(
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.event_available_rounded,
-                      color: Colors.white38,
-                      size: 48,
-                    ),
-                    SizedBox(height: AppSpacing.sm),
-                    Text(
-                      'No upcoming appointments',
+                if (_upcomingAppointments != null &&
+                    _upcomingAppointments!.isNotEmpty)
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        slideRoute(const UpcomingAppointmentsScreen()),
+                      );
+                    },
+                    child: Text(
+                      'View All',
                       style: TextStyle(
-                        color: Colors.white54,
-                        fontSize: 14,
+                        color: AppColors.primary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ],
-                ),
-              ),
-            )
-          else
-            ..._upcomingAppointments!.take(2).map(
-                  (apt) => Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                    child: _UpcomingAppointmentCard(
-                      appointment: apt,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          slideRoute(const UpcomingAppointmentsScreen()),
-                        );
-                      },
-                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            if (_upcomingAppointments == null || _upcomingAppointments!.isEmpty)
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: const Center(
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.event_available_rounded,
+                        color: Colors.white38,
+                        size: 48,
+                      ),
+                      SizedBox(height: AppSpacing.sm),
+                      Text(
+                        'No upcoming appointments',
+                        style: TextStyle(color: Colors.white54, fontSize: 14),
+                      ),
+                    ],
                   ),
                 ),
-        ],
+              )
+            else
+              ..._upcomingAppointments!
+                  .take(2)
+                  .map(
+                    (apt) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: _UpcomingAppointmentCard(
+                        appointment: apt,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            slideRoute(const UpcomingAppointmentsScreen()),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+          ],
+        ),
       ),
     );
   }
@@ -339,9 +340,7 @@ class _QuickActionCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.cardBg,
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          border: Border.all(
-            color: color.withOpacity(0.5),
-          ),
+          border: Border.all(color: color.withOpacity(0.5)),
         ),
         child: Column(
           children: [
@@ -351,9 +350,7 @@ class _QuickActionCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: color.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(AppRadius.md),
-                border: Border.all(
-                  color: color.withOpacity(0.5),
-                ),
+                border: Border.all(color: color.withOpacity(0.5)),
               ),
               child: Icon(icon, color: color, size: 28),
             ),
@@ -398,9 +395,7 @@ class _MainActionCard extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: gradient,
           borderRadius: BorderRadius.circular(AppRadius.xl),
-          border: Border.all(
-            color: AppColors.primary.withOpacity(0.5),
-          ),
+          border: Border.all(color: AppColors.primary.withOpacity(0.5)),
         ),
         child: Row(
           children: [
@@ -410,9 +405,7 @@ class _MainActionCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(AppRadius.lg),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.3),
-                ),
+                border: Border.all(color: Colors.white.withOpacity(0.3)),
               ),
               child: Icon(icon, color: Colors.white, size: 32),
             ),
@@ -432,10 +425,7 @@ class _MainActionCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                    ),
+                    style: const TextStyle(color: Colors.white70, fontSize: 13),
                   ),
                 ],
               ),
@@ -470,9 +460,7 @@ class _UpcomingAppointmentCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.cardBg,
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          border: Border.all(
-            color: AppColors.primary.withOpacity(0.3),
-          ),
+          border: Border.all(color: AppColors.primary.withOpacity(0.3)),
         ),
         child: Row(
           children: [
@@ -482,9 +470,7 @@ class _UpcomingAppointmentCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.primary.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(AppRadius.md),
-                border: Border.all(
-                  color: AppColors.primary.withOpacity(0.5),
-                ),
+                border: Border.all(color: AppColors.primary.withOpacity(0.5)),
               ),
               child: const Icon(
                 Icons.medical_services_rounded,
@@ -498,7 +484,7 @@ class _UpcomingAppointmentCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    appointment.doctorName,
+                    appointment.doctorName ?? 'Doctor',
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -507,7 +493,7 @@ class _UpcomingAppointmentCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    appointment.specialization,
+                    appointment.specialization ?? '',
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.primary,
@@ -549,16 +535,11 @@ class _UpcomingAppointmentCard extends StatelessWidget {
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: AppColors.primary.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(AppRadius.full),
-                border: Border.all(
-                  color: AppColors.primary.withOpacity(0.5),
-                ),
+                border: Border.all(color: AppColors.primary.withOpacity(0.5)),
               ),
               child: Text(
                 '#${appointment.tokenNumber}',

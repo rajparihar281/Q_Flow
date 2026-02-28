@@ -8,7 +8,7 @@ import 'package:q_flow/data/repositories/appointment_repository.dart';
 import 'package:q_flow/presentation/booking/booking_confirmation_screen.dart';
 
 class BookAppointmentScreen extends StatefulWidget {
-  final DoctorModel doctor;
+  final HospitalDoctorModel doctor;
   final HospitalModel hospital;
   final AppointmentRepository repo;
 
@@ -50,11 +50,10 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     setState(() => _confirming = true);
     final appointment = await widget.repo.bookAppointment(
       doctorName: widget.doctor.name,
-      hospitalName: widget.hospital.name,
+      doctorId: widget.doctor.id,
       specialization: widget.doctor.specialization,
       dateTime: _selectedDate,
-      severity: _severity,
-      symptoms: _symptomsCtrl.text.trim().isEmpty
+      reason: _symptomsCtrl.text.trim().isEmpty
           ? 'Not specified'
           : _symptomsCtrl.text.trim(),
     );

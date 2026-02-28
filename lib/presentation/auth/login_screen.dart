@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:q_flow/core/constants/app_constants.dart';
 import 'package:q_flow/core/theme/app_theme.dart';
 import 'package:q_flow/core/utils/app_utils.dart';
 import 'package:q_flow/core/widgets/gradient_scaffold.dart';
 import 'package:q_flow/core/widgets/app_card.dart';
+import 'package:q_flow/data/models/patient_model.dart';
 import 'package:q_flow/data/repositories/patient_repository.dart';
 import 'package:q_flow/presentation/auth/otp_screen.dart';
 
@@ -17,11 +17,15 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
-  final _controller = TextEditingController(text: 'PMJAY-MH-2024-887654');
   final _repo = PatientRepository();
   late AnimationController _btnCtrl;
   late Animation<double> _scaleAnim;
-  bool _loading = false;
+
+  List<PatientModel>? _patients;
+  String? _selectedPatientId;
+  bool _loadingPatients = true;
+  bool _loadingLogin = false;
+  String? _error;
 
   @override
   void initState() {
@@ -34,24 +38,64 @@ class _LoginScreenState extends State<LoginScreen>
       begin: 1,
       end: 0.95,
     ).animate(CurvedAnimation(parent: _btnCtrl, curve: Curves.easeInOut));
+
+    _loadPatients();
+  }
+
+  Future<void> _loadPatients() async {
+    try {
+      final patients = await _repo.getAllPatients();
+      if (!mounted) return;
+
+      // Filter out any duplicates by ID to guarantee unique dropdown values
+      final uniquePatients = <String, PatientModel>{};
+      for (var p in patients) {
+        uniquePatients[p.id] = p;
+      }
+
+      setState(() {
+        _patients = uniquePatients.values.toList();
+        if (_patients!.isNotEmpty) {
+          _selectedPatientId = _patients!.first.id;
+        }
+        _loadingPatients = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = 'Failed to load demo patients: $e';
+        _loadingPatients = false;
+      });
+    }
   }
 
   @override
   void dispose() {
     _btnCtrl.dispose();
-    _controller.dispose();
     super.dispose();
   }
 
   Future<void> _sendOtp() async {
-    if (_controller.text.trim().isEmpty) return;
-    setState(() => _loading = true);
+    if (_selectedPatientId == null || _patients == null) return;
+
+    final selectedPatient = _patients!.firstWhere(
+      (p) => p.id == _selectedPatientId,
+    );
+
+    setState(() => _loadingLogin = true);
     await _btnCtrl.forward();
     await _btnCtrl.reverse();
-    await _repo.sendOtp(_controller.text.trim());
+
+    // Use ABHA ID of selected realistic patient
+    await _repo.sendOtp(selectedPatient.abhaId);
+
     if (!mounted) return;
-    setState(() => _loading = false);
-    Navigator.of(context).push(slideRoute(const OtpScreen()));
+    setState(() => _loadingLogin = false);
+
+    // Pass the selected abhaId so the OTP screen knows who to verify
+    Navigator.of(
+      context,
+    ).push(slideRoute(OtpScreen(abhaId: selectedPatient.abhaId)));
   }
 
   @override
@@ -80,24 +124,65 @@ class _LoginScreenState extends State<LoginScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'ABHA ID',
+                      'Select Patient (Demo Mode)',
                       style: AppTextStyles.labelBold.copyWith(
                         color: AppColors.primary,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
-                    TextField(
-                      controller: _controller,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(
-                          Icons.credit_card,
-                          color: AppColors.primary,
+                    if (_loadingPatients)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(AppSpacing.md),
+                          child: CircularProgressIndicator(),
                         ),
-                        hintText: 'Enter your ABHA ID',
-                        hintStyle: TextStyle(color: AppColors.textHint),
+                      )
+                    else if (_error != null)
+                      Text(
+                        _error!,
+                        style: const TextStyle(color: AppColors.danger),
+                      )
+                    else if (_patients == null || _patients!.isEmpty)
+                      const Text(
+                        'No patients found in live database.',
+                        style: TextStyle(color: AppColors.danger),
+                      )
+                    else
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          border: Border.all(
+                            color: AppColors.primary.withOpacity(0.2),
+                          ),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedPatientId,
+                            isExpanded: true,
+                            icon: const Icon(
+                              Icons.arrow_drop_down,
+                              color: AppColors.primary,
+                            ),
+                            dropdownColor: AppColors.surface,
+                            items: _patients!.map((patient) {
+                              return DropdownMenuItem<String>(
+                                value: patient.id,
+                                child: Text(
+                                  '${patient.fullName} (${patient.abhaId})',
+                                  style: AppTextStyles.bodyMedium,
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (val) {
+                              if (val != null) {
+                                setState(() => _selectedPatientId = val);
+                              }
+                            },
+                          ),
+                        ),
                       ),
-                    ),
                     const SizedBox(height: AppSpacing.md),
                     ScaleTransition(
                       scale: _scaleAnim,
@@ -105,17 +190,21 @@ class _LoginScreenState extends State<LoginScreen>
                         width: double.infinity,
                         height: 52,
                         child: ElevatedButton(
-                          onPressed: _loading ? null : _sendOtp,
+                          onPressed:
+                              (_loadingLogin || _selectedPatientId == null)
+                              ? null
+                              : _sendOtp,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
-                            disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
+                            disabledBackgroundColor: AppColors.primary
+                                .withOpacity(0.5),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(AppRadius.md),
                             ),
                             elevation: 0,
                           ),
-                          child: _loading
+                          child: _loadingLogin
                               ? const SizedBox(
                                   width: 22,
                                   height: 22,
@@ -125,7 +214,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   ),
                                 )
                               : const Text(
-                                  'Send OTP',
+                                  'Login',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
