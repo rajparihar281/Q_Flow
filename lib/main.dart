@@ -3,8 +3,17 @@ import 'package:flutter/services.dart';
 import 'package:q_flow/core/theme/app_theme.dart';
 import 'package:q_flow/presentation/auth/login_screen.dart';
 
-void main() {
+import 'package:q_flow/core/services/notification_service.dart';
+import 'package:q_flow/core/config/api_config.dart';
+import 'package:q_flow/core/websocket/queue_websocket_service.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService().init();
+
+  // Connect globals
+  final ws = QueueWebSocketService();
+  ws.connect(ApiConfig.wsUrl);
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(

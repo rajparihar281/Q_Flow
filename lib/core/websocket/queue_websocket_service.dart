@@ -1,6 +1,7 @@
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:convert';
 import '../../data/models/queue_model.dart';
+import '../services/notification_service.dart';
 
 /// Manages the WebSocket connection to the Q-Flow queue endpoint.
 /// Usage:
@@ -26,6 +27,16 @@ class QueueWebSocketService {
           .where((raw) {
             try {
               final payload = json.decode(raw as String);
+              if (payload['type'] == 'patient-called') {
+                if (payload['patientId'] == 'demo-patient-1') {
+                  NotificationService().showNotification(
+                    id: 1,
+                    title: "It's Your Turn",
+                    body: "Please proceed to consultation room",
+                  );
+                }
+                return false;
+              }
               return payload['type'] == 'queue_update';
             } catch (_) {
               return false;

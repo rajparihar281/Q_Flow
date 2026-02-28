@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen>
       setState(() {
         _patients = uniquePatients.values.toList();
         if (_patients!.isNotEmpty) {
-          _selectedPatientId = 'PMJAY-MH-2024-887654'; // Pre-filled for demo
+          _selectedPatientId = 'ABHA00001'; // Pre-filled for demo
           _abhaCtrl.text = _selectedPatientId!;
         }
         _loadingPatients = false;
@@ -125,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Select Patient (Demo Mode)',
+                      'Enter your ABHA ID to login',
                       style: AppTextStyles.labelBold.copyWith(
                         color: AppColors.primary,
                       ),
@@ -145,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen>
                       )
                     else if (_patients == null || _patients!.isEmpty)
                       const Text(
-                        'No patients found in live database.',
+                        'Server Issue.',
                         style: TextStyle(color: AppColors.danger),
                       )
                     else
