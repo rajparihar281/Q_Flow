@@ -1,6 +1,7 @@
 import 'package:q_flow/core/config/api_config.dart';
 import 'package:q_flow/core/services/api_service.dart';
 import 'package:q_flow/data/models/appointment_model.dart';
+import 'package:q_flow/core/utils/session_manager.dart';
 
 class AppointmentRepository {
   Future<List<AppointmentModel>> getAllAppointments() async {
@@ -34,7 +35,9 @@ class AppointmentRepository {
 
   Future<List<AppointmentModel>> getUpcomingAppointments() async {
     final all = await getAllAppointments();
-    return all.where((a) => a.status == 'scheduled').toList();
+    return all
+        .where((a) => a.status == 'upcoming' || a.status == 'scheduled')
+        .toList();
   }
 
   Future<AppointmentModel> updateStatus(String id, String status) async {
@@ -53,20 +56,18 @@ class AppointmentRepository {
     required DateTime dateTime,
     required String reason,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    return AppointmentModel(
-      id: 'local-${DateTime.now().millisecondsSinceEpoch}',
-      patientId: '',
-      doctorId: doctorId,
-      appointmentDatetime: dateTime,
-      status: 'scheduled',
-      reason: reason,
-      priorityScore: 0,
-      estimatedWaitMinutes: 0,
-      aiFlag: false,
-      doctorName: doctorName,
-      specialization: specialization,
-    );
+    final patientId = SessionManager.getPatientId();
+    if (patientId == null) {
+      throw Exception('No active session. Please log in again.');
+    }
+
+    final response = await ApiService.post(ApiConfig.appointments, {
+      'patientId': patientId,
+      'doctorId': doctorId,
+      'appointmentDatetime': dateTime.toIso8601String(),
+      'reason': reason,
+    });
+    return AppointmentModel.fromJson(response['data'] as Map<String, dynamic>);
   }
 
   /// Reschedule stub — not yet supported by backend.

@@ -23,17 +23,22 @@ class QueueWebSocketService {
 
       // Transform raw WebSocket messages → List<QueueModel>
       _broadcastStream = _channel!.stream
+          .where((raw) {
+            try {
+              final payload = json.decode(raw as String);
+              return payload['type'] == 'queue_update';
+            } catch (_) {
+              return false;
+            }
+          })
           .map((raw) {
             final Map<String, dynamic> payload = json.decode(raw as String);
-            if (payload['type'] == 'queue_update') {
-              final List<dynamic> data = payload['data'] ?? [];
-              return data
-                  .map(
-                    (item) => QueueModel.fromJson(item as Map<String, dynamic>),
-                  )
-                  .toList();
-            }
-            return <QueueModel>[];
+            final List<dynamic> data = payload['data'] ?? [];
+            return data
+                .map(
+                  (item) => QueueModel.fromJson(item as Map<String, dynamic>),
+                )
+                .toList();
           })
           .handleError((dynamic err) {
             _isConnected = false;

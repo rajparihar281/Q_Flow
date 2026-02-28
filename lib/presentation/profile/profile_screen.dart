@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:q_flow/core/constants/app_constants.dart';
 import 'package:q_flow/core/theme/app_theme.dart';
+import 'package:q_flow/core/utils/app_utils.dart';
 import 'package:q_flow/core/widgets/app_card.dart';
 import 'package:q_flow/data/models/patient_model.dart';
 import 'package:q_flow/data/repositories/patient_repository.dart';
@@ -133,7 +134,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const Divider(height: 20),
           _fieldRow(
             'Date of Birth',
-            patient.dateOfBirth,
+            AppUtils.formatDate(
+              DateTime.tryParse(patient.dateOfBirth) ?? DateTime.now(),
+            ), // Corrected to use AppUtils.formatDate
             Icons.cake_outlined,
             locked: true,
           ),

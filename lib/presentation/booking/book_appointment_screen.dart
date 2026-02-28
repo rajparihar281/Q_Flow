@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:q_flow/core/constants/app_constants.dart';
 import 'package:q_flow/core/theme/app_theme.dart';
 import 'package:q_flow/core/utils/app_utils.dart';
+import 'package:q_flow/core/widgets/gradient_scaffold.dart';
+import 'package:q_flow/core/widgets/app_card.dart';
 import 'package:q_flow/core/widgets/state_widgets.dart';
 import 'package:q_flow/data/models/hospital_model.dart';
 import 'package:q_flow/data/repositories/appointment_repository.dart';
@@ -26,6 +28,7 @@ class BookAppointmentScreen extends StatefulWidget {
 class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   final _symptomsCtrl = TextEditingController();
   String _severity = 'Medium';
+  String _gender = 'Male';
   DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
   String _selectedTime = '10:00 AM';
   bool _confirming = false;
@@ -33,6 +36,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
 
   final _times = ['09:00 AM', '10:00 AM', '11:30 AM', '02:00 PM', '04:00 PM'];
   final _severities = ['Low', 'Medium', 'High'];
+  final _genders = ['Male', 'Female', 'Other'];
 
   @override
   void dispose() {
@@ -67,9 +71,8 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.surface,
-      body: CustomScrollView(
+    return GradientScaffold(
+      child: CustomScrollView(
         slivers: [
           _buildAppBar(),
           SliverToBoxAdapter(
@@ -83,6 +86,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                   _buildSection('Select Date', _buildDatePicker()),
                   _buildSection('Select Time', _buildTimeChips()),
                   _buildSection('Symptoms / Reason', _buildSymptomsField()),
+                  _buildSection('Gender', _buildGenderSelector()),
                   _buildSection('Severity', _buildSeveritySelector()),
                   _buildConsentCheckbox(),
                   const SizedBox(height: AppSpacing.lg),
@@ -109,7 +113,8 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   SliverAppBar _buildAppBar() {
     return SliverAppBar(
       pinned: true,
-      backgroundColor: AppColors.primary,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
       foregroundColor: Colors.white,
       title: const Text('Book Appointment'),
       leading: IconButton(
@@ -120,12 +125,9 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   }
 
   Widget _buildDoctorBanner() {
-    return Container(
+    return GlassCard(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-      ),
+      borderRadius: AppRadius.xl,
       child: Row(
         children: [
           CircleAvatar(
@@ -274,6 +276,40 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           borderSide: BorderSide.none,
         ),
       ),
+    );
+  }
+
+  Widget _buildGenderSelector() {
+    return Row(
+      children: _genders.map((g) {
+        final sel = g == _gender;
+        return Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => _gender = g),
+            child: AnimatedContainer(
+              duration: AppDurations.normal,
+              margin: const EdgeInsets.only(right: AppSpacing.sm),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: sel ? AppColors.primary : AppColors.inputFill,
+                border: Border.all(
+                  color: sel ? AppColors.primary : Colors.transparent,
+                ),
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
+              child: Center(
+                child: Text(
+                  g,
+                  style: TextStyle(
+                    color: sel ? Colors.white : AppColors.textSecondary,
+                    fontWeight: sel ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 

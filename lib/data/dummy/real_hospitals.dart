@@ -11,7 +11,7 @@ final List<HospitalModel> realHospitals = [
     phone: '+91-40-2360-7777',
     doctors: [
       const HospitalDoctorModel(
-        id: 'd1',
+        id: '81caef5f-9565-4d6b-8f22-abc2a8d8eea5',
         name: 'Dr. Rajesh Kumar',
         specialization: 'Cardiology',
         experience: '15 yrs',
@@ -21,7 +21,7 @@ final List<HospitalModel> realHospitals = [
         hospitalId: 'h1',
       ),
       const HospitalDoctorModel(
-        id: 'd2',
+        id: '75756433-e567-48b4-b121-b649d8515450',
         name: 'Dr. Priya Sharma',
         specialization: 'Neurology',
         experience: '12 yrs',
@@ -42,7 +42,7 @@ final List<HospitalModel> realHospitals = [
     phone: '+91-80-6621-4444',
     doctors: [
       const HospitalDoctorModel(
-        id: 'd3',
+        id: 'dc99b853-79c9-44f8-806e-0f505b292108',
         name: 'Dr. Amit Patel',
         specialization: 'Oncology',
         experience: '18 yrs',
@@ -52,7 +52,7 @@ final List<HospitalModel> realHospitals = [
         hospitalId: 'h2',
       ),
       const HospitalDoctorModel(
-        id: 'd4',
+        id: '7af3995d-2021-420d-8920-a0f8ab7d096d',
         name: 'Dr. Sneha Reddy',
         specialization: 'Gastroenterology',
         experience: '10 yrs',
@@ -73,7 +73,7 @@ final List<HospitalModel> realHospitals = [
     phone: '+91-11-2651-5050',
     doctors: [
       const HospitalDoctorModel(
-        id: 'd5',
+        id: 'a9204842-1d53-4c65-a421-1bbb41f41626',
         name: 'Dr. Vikram Singh',
         specialization: 'Orthopedics',
         experience: '20 yrs',
@@ -83,7 +83,7 @@ final List<HospitalModel> realHospitals = [
         hospitalId: 'h3',
       ),
       const HospitalDoctorModel(
-        id: 'd6',
+        id: '81caef5f-9565-4d6b-8f22-abc2a8d8eea5',
         name: 'Dr. Anjali Mehta',
         specialization: 'Urology',
         experience: '14 yrs',
@@ -104,7 +104,7 @@ final List<HospitalModel> realHospitals = [
     phone: '+91-80-2502-4444',
     doctors: [
       const HospitalDoctorModel(
-        id: 'd7',
+        id: '75756433-e567-48b4-b121-b649d8515450',
         name: 'Dr. Kavita Nair',
         specialization: 'Pediatrics',
         experience: '16 yrs',
@@ -114,7 +114,7 @@ final List<HospitalModel> realHospitals = [
         hospitalId: 'h4',
       ),
       const HospitalDoctorModel(
-        id: 'd8',
+        id: 'dc99b853-79c9-44f8-806e-0f505b292108',
         name: 'Dr. Sunita Desai',
         specialization: 'Gynecology',
         experience: '13 yrs',
@@ -135,7 +135,7 @@ final List<HospitalModel> realHospitals = [
     phone: '+91-80-7122-2222',
     doctors: [
       const HospitalDoctorModel(
-        id: 'd9',
+        id: '7af3995d-2021-420d-8920-a0f8ab7d096d',
         name: 'Dr. Ramesh Iyer',
         specialization: 'Cardiology',
         experience: '22 yrs',
@@ -145,7 +145,7 @@ final List<HospitalModel> realHospitals = [
         hospitalId: 'h5',
       ),
       const HospitalDoctorModel(
-        id: 'd10',
+        id: 'a9204842-1d53-4c65-a421-1bbb41f41626',
         name: 'Dr. Meera Krishnan',
         specialization: 'Nephrology',
         experience: '11 yrs',

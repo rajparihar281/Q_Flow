@@ -220,7 +220,19 @@ class _AppointmentCard extends StatelessWidget {
             apt.specialization ?? '',
             style: AppTextStyles.caption.copyWith(color: AppColors.primary),
           ),
-          Text(apt.hospitalName ?? '', style: AppTextStyles.bodySmall),
+          Row(
+            children: [
+              const Icon(
+                Icons.local_hospital_outlined,
+                size: 13,
+                color: Colors.grey,
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(apt.hospitalName, style: AppTextStyles.bodySmall),
+              ),
+            ],
+          ),
           const Divider(height: 16),
           Row(
             children: [
@@ -235,14 +247,13 @@ class _AppointmentCard extends StatelessWidget {
                 style: AppTextStyles.bodySmall,
               ),
               const Spacer(),
-              if (apt.tokenNumber != null)
-                Text(
-                  'Token #${apt.tokenNumber}',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
+              Text(
+                'Token #${apt.tokenNumber}',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
                 ),
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),

@@ -23,6 +23,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   List<PatientModel>? _patients;
   String? _selectedPatientId;
+  final TextEditingController _abhaCtrl = TextEditingController();
   bool _loadingPatients = true;
   bool _loadingLogin = false;
   String? _error;
@@ -56,7 +57,8 @@ class _LoginScreenState extends State<LoginScreen>
       setState(() {
         _patients = uniquePatients.values.toList();
         if (_patients!.isNotEmpty) {
-          _selectedPatientId = _patients!.first.id;
+          _selectedPatientId = 'PMJAY-MH-2024-887654'; // Pre-filled for demo
+          _abhaCtrl.text = _selectedPatientId!;
         }
         _loadingPatients = false;
       });
@@ -71,6 +73,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   void dispose() {
+    _abhaCtrl.dispose();
     _btnCtrl.dispose();
     super.dispose();
   }
@@ -78,24 +81,22 @@ class _LoginScreenState extends State<LoginScreen>
   Future<void> _sendOtp() async {
     if (_selectedPatientId == null || _patients == null) return;
 
-    final selectedPatient = _patients!.firstWhere(
-      (p) => p.id == _selectedPatientId,
-    );
+    if (_abhaCtrl.text.isEmpty) return;
+
+    final inputAbha = _abhaCtrl.text.trim();
 
     setState(() => _loadingLogin = true);
     await _btnCtrl.forward();
     await _btnCtrl.reverse();
 
-    // Use ABHA ID of selected realistic patient
-    await _repo.sendOtp(selectedPatient.abhaId);
+    // Use entered ABHA ID
+    await _repo.sendOtp(inputAbha);
 
     if (!mounted) return;
     setState(() => _loadingLogin = false);
 
-    // Pass the selected abhaId so the OTP screen knows who to verify
-    Navigator.of(
-      context,
-    ).push(slideRoute(OtpScreen(abhaId: selectedPatient.abhaId)));
+    // Pass the entered abhaId so the OTP screen knows who to verify
+    Navigator.of(context).push(slideRoute(OtpScreen(abhaId: inputAbha)));
   }
 
   @override
@@ -154,32 +155,22 @@ class _LoginScreenState extends State<LoginScreen>
                           color: AppColors.surface,
                           borderRadius: BorderRadius.circular(AppRadius.md),
                           border: Border.all(
-                            color: AppColors.primary.withOpacity(0.2),
+                            color: AppColors.primary.withOpacity(0.5),
                           ),
                         ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: _selectedPatientId,
-                            isExpanded: true,
-                            icon: const Icon(
-                              Icons.arrow_drop_down,
+                        child: TextField(
+                          controller: _abhaCtrl,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: Colors.white,
+                          ),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Enter ABHA ID',
+                            hintStyle: TextStyle(color: Colors.white54),
+                            icon: Icon(
+                              Icons.badge_outlined,
                               color: AppColors.primary,
                             ),
-                            dropdownColor: AppColors.surface,
-                            items: _patients!.map((patient) {
-                              return DropdownMenuItem<String>(
-                                value: patient.id,
-                                child: Text(
-                                  '${patient.fullName} (${patient.abhaId})',
-                                  style: AppTextStyles.bodyMedium,
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              if (val != null) {
-                                setState(() => _selectedPatientId = val);
-                              }
-                            },
                           ),
                         ),
                       ),
@@ -190,8 +181,7 @@ class _LoginScreenState extends State<LoginScreen>
                         width: double.infinity,
                         height: 52,
                         child: ElevatedButton(
-                          onPressed:
-                              (_loadingLogin || _selectedPatientId == null)
+                          onPressed: (_loadingLogin || _abhaCtrl.text.isEmpty)
                               ? null
                               : _sendOtp,
                           style: ElevatedButton.styleFrom(

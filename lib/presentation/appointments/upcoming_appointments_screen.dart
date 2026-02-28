@@ -320,7 +320,7 @@ class _AppointmentCard extends StatelessWidget {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        apt.hospitalName ?? '',
+                        apt.hospitalName,
                         style: AppTextStyles.bodyMedium,
                       ),
                     ),

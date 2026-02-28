@@ -6,6 +6,7 @@ import 'package:q_flow/core/widgets/gradient_scaffold.dart';
 import 'package:q_flow/data/models/appointment_model.dart';
 import 'package:q_flow/presentation/queue/live_queue_screen.dart';
 import 'package:q_flow/presentation/home/home_screen.dart';
+import 'package:q_flow/core/widgets/app_card.dart';
 
 class BookingConfirmationScreen extends StatefulWidget {
   final AppointmentModel appointment;
@@ -97,20 +98,10 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen>
   }
 
   Widget _buildDetailCard(AppointmentModel apt) {
-    return Container(
-      width: double.infinity,
+    return AppCard(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x18000000),
-            blurRadius: 20,
-            offset: Offset(0, 8),
-          ),
-        ],
-      ),
+      borderRadius: AppRadius.xl,
+      borderGlow: true,
       child: Column(
         children: [
           _row(
@@ -130,14 +121,14 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen>
           _row(
             Icons.person_outline_rounded,
             'Doctor',
-            apt.doctorName ?? '',
+            apt.doctorNameOrEmpty,
             AppColors.secondary,
           ),
           const Divider(height: 20),
           _row(
             Icons.local_hospital_outlined,
             'Hospital',
-            apt.hospitalName ?? '',
+            apt.hospitalName,
             AppColors.primary,
           ),
           const Divider(height: 20),

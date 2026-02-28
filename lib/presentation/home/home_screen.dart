@@ -276,22 +276,36 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: AppSpacing.sm),
             if (_upcomingAppointments == null || _upcomingAppointments!.isEmpty)
               Container(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: const Center(
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.event_available_rounded,
-                        color: Colors.white38,
-                        size: 48,
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxl),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                ),
+                child: const Column(
+                  children: [
+                    Icon(
+                      Icons.event_available_rounded,
+                      color: AppColors.primary,
+                      size: 48,
+                    ),
+                    SizedBox(height: AppSpacing.md),
+                    Text(
+                      'No Upcoming Appointments',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
-                      SizedBox(height: AppSpacing.sm),
-                      Text(
-                        'No upcoming appointments',
-                        style: TextStyle(color: Colors.white54, fontSize: 14),
-                      ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Book an appointment or visit a hospital.',
+                      style: TextStyle(color: Colors.white54, fontSize: 13),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               )
             else
